@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: black; /* Set background color to black */
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px; /* Increase the gap between cells */
+            margin-bottom: 20px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #1a1a1a; /* Dark gray cell background */
+            border: 4px solid #444; /* Darker border */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px; /* Slightly larger font size */
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* White shadow */
+        }
+
+        .cell:hover {
+            background-color: #333; /* Lighten cell background on hover */
+            border-color: #888; /* Lighten border on hover */
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.7); /* Increase shadow intensity on hover */
+        }
+
+        .x {
+            color: #ff4d4d; /* Bright red for X */
+        }
+
+        .o {
+            color: #4da6ff; /* Bright blue for O */
+        }
+
+        .message {
+            font-size: 20px;
+            color: #fff; /* White text color */
+        }
+
+        #restartButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #1a1a1a;
+            color: white;
+            border: 2px solid #444;
+            margin-top: 20px;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        #restartButton:hover {
+            background-color: #333;
+            border-color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="color:white;">Tic Tac Toe</h1> <!-- White color for the heading -->
+        <div class="board">
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+        </div>
+        <button id="restartButton">Restart Game</button>
+        <p class="message"></p>
+    </div>
+
+    <script>
+        const X_CLASS = 'x';
+        const O_CLASS = 'o';
+        const WINNING_COMBINATIONS = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        const cellElements = document.querySelectorAll('[data-cell]');
+        const board = document.querySelector('.board');
+        const restartButton = document.getElementById('restartButton');
+        const messageElement = document.querySelector('.message');
+        let oTurn;
+
+        startGame();
+
+        restartButton.addEventListener('click', startGame);
+
+        function startGame() {
+            oTurn = false;
+            cellElements.forEach(cell => {
+                cell.classList.remove(X_CLASS);
+                cell.classList.remove(O_CLASS);
+                cell.textContent = '';  // Clear the cell's content
+                cell.removeEventListener('click', handleClick);
+                cell.addEventListener('click', handleClick, { once: true });
+            });
+            messageElement.textContent = '';
+        }
+
+        function handleClick(e) {
+            const cell = e.target;
+            const currentClass = oTurn ? O_CLASS : X_CLASS;
+            placeMark(cell, currentClass);
+            if (checkWin(currentClass)) {
+                endGame(false);
+            } else if (isDraw()) {
+                endGame(true);
+            } else {
+                swapTurns();
+            }
+        }
+
+        function endGame(draw) {
+            if (draw) {
+                messageElement.textContent = "Draw!";
+            } else {
+                messageElement.textContent = `${oTurn ? "O's" : "X's"} Wins!`;
+            }
+        }
+
+        function isDraw() {
+            return [...cellElements].every(cell => {
+                return cell.classList.contains(X_CLASS) || cell.classList.contains(O_CLASS);
+            });
+        }
+
+        function placeMark(cell, currentClass) {
+            cell.classList.add(currentClass);
+            cell.textContent = currentClass.toUpperCase();  // Add the mark to the cell
+        }
+
+        function swapTurns() {
+            oTurn = !oTurn;
+        }
+
+        function checkWin(currentClass) {
+            return WINNING_COMBINATIONS.some(combination => {
+                return combination.every(index => {
+                    return cellElements[index].classList.contains(currentClass);
+                });
+            });
+        }
+    </script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+</html>
